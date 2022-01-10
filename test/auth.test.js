@@ -30,7 +30,7 @@ describe('Test de autentificación', () => {
     it("Should return 400 when no data is provided", (done) => {
         //Primero logueamos al usuario
         chai.request(app)
-            .post('/login')
+            .post('/auth/login')
             .end((err, res) => {
                 chai.assert.equal(res.statusCode, 400);
                 done();
@@ -40,7 +40,7 @@ describe('Test de autentificación', () => {
     it("Should return 200 and token for succesful login", (done) => {
         //Primero logueamos al usuario
         chai.request(app)
-            .post('/login')
+            .post('/auth/login')
             .set('content-type', 'application/json')
             .send({user: 'bettatech', password: '1234'})
             .end((err, res) => {
@@ -52,7 +52,7 @@ describe('Test de autentificación', () => {
     it("Should return 200 when jwt is valid", (done) => {
         //Primero logueamos al usuario
         chai.request(app)
-            .post('/login')
+            .post('/auth/login')
             .set('content-type', 'application/json')
             .send({user: 'bettatech', password: '1234'})
             .end((err, res) => {

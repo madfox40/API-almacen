@@ -17,7 +17,6 @@ const registerUser = (userName, password) => {
 const getUserIdFromUserName = (userName) => {
     for (let user in userDataBase) {
         if (userDataBase[user].userName == userName) {
-            console.log(userDataBase[user])
             return userDataBase[user];
         }
     }
