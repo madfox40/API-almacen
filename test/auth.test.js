@@ -12,7 +12,7 @@ chai.use(chaiHTTP);
 //decir asíncronos tienen un coste de tiempo asociado
 //done es una función para avisar cuando ha terminado el test y que no sale de linea
 //en caso de que no haya una respuesta sincrona
-describe('Este es un test de prueba', () => {
+describe('Test de prueba', () => {
     it('Should return hello world', (done) => {
         chai.request(app) //Sirve para iniciar el servidor para el entorno de pruebas
             .get('/')
@@ -24,18 +24,45 @@ describe('Este es un test de prueba', () => {
             });
 
     });
+});
+describe('Test de autentificación', () => {
+
+    it("Should return 400 when no data is provided", (done) => {
+        //Primero logueamos al usuario
+        chai.request(app)
+            .post('/login')
+            .end((err, res) => {
+                chai.assert.equal(res.statusCode, 400);
+                done();
+            });
+    });
+
+    it("Should return 200 and token for succesful login", (done) => {
+        //Primero logueamos al usuario
+        chai.request(app)
+            .post('/login')
+            .set('content-type', 'application/json')
+            .send({user: 'bettatech', password: '1234'})
+            .end((err, res) => {
+                chai.assert.equal(res.statusCode, 200);
+                done();
+            });
+    });
 
     it("Should return 200 when jwt is valid", (done) => {
         //Primero logueamos al usuario
         chai.request(app)
             .post('/login')
+            .set('content-type', 'application/json')
+            .send({user: 'bettatech', password: '1234'})
             .end((err, res) => {
                 //Comprobamos si el token es correcto
+                chai.assert.equal(res.statusCode, 200);
                 chai.request(app)
                     .get('/team')
+                    .set('Authorization', `jwt ${res.body.token}`)
                     //Aquí estamos mandando el header con nombre authorization
                     //y valor JWT token
-                    .set('Authorization', `JWT ${res.body.token}`)
                     .end((err, res) => {
                         chai.assert.equal(res.statusCode, 200);
                         done();
