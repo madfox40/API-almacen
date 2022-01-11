@@ -1,9 +1,22 @@
 const chai = require('chai');
 const chaiHTTP = require('chai-http');
-
 chai.use(chaiHTTP);
+const usersController = require('../controllers/users');
+const teamsControler = require('../controllers/teams');
 
 const app = require('../app').app;
+
+beforeEach((done) => {
+    usersController.registerUser('bettatech', '1234');
+    usersController.registerUser('victor22junio', '4321');
+    console.log('Se ha hecho esta wea');
+    done();
+});
+
+afterEach((done) => {
+    teamsControler.cleanUpTeam();
+    done();
+});
 
 describe('Pruebas de teams', () => {
     it("Should return the team of the given user", (done) => {
@@ -12,7 +25,7 @@ describe('Pruebas de teams', () => {
         chai.request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
-            .send({ user: 'bettatech', password: '1234' })
+            .send({ user: 'victor22junio', password: '4321' })
             .end((err, res) => {
                 let token = res.body.token;
                 //Comprobamos si el token es correcto
@@ -29,7 +42,7 @@ describe('Pruebas de teams', () => {
                                 //tiene equipo con Charizard y Blastoise
                                 // {trainer: 'mastermind', team: [Pokemon]}
                                 chai.assert.equal(res.statusCode, 200);
-                                chai.assert.equal(res.body.trainer, 'bettatech');
+                                chai.assert.equal(res.body.trainer, 'victor22junio');
                                 chai.assert.equal(res.body.team.length, 3);
                                 chai.assert.equal(res.body.team[0].name, 'Charizard');
                                 chai.assert.equal(res.body.team[1].name, 'Blastoise');
@@ -40,4 +53,45 @@ describe('Pruebas de teams', () => {
             });
 
     });
+
+
+    it("Should return the pokedex number", (done) => {
+        //Primero logueamos al usuario
+        let pokemonName =  'bulbasaur';
+        chai.request(app)
+            .post('/auth/login')
+            .set('content-type', 'application/json')
+            .send({ user: 'victor22junio', password: '4321' })
+            .end((err, res) => {
+                let token = res.body.token;
+                //Comprobamos si el token es correcto
+                chai.assert.equal(res.statusCode, 200);
+                chai.request(app)
+                    .post('/team/pokemons')
+                    .send({name:pokemonName})
+                    .set('Authorization', `jwt ${token}`)
+                    .end((err, res) => {
+                        chai.request(app)
+                            .get('/team')
+                            .set('Authorization', `jwt ${token}`)
+                            .end((err, res) => {
+                                //tiene equipo con Charizard y Blastoise
+                                // {trainer: 'mastermind', team: [Pokemon]}
+                                chai.assert.equal(res.statusCode, 200);
+                                chai.assert.equal(res.body.trainer, 'victor22junio');
+                                chai.assert.equal(res.body.team.length, 1);
+                                chai.assert.equal(res.body.team[0].name, 'bulbasaur');
+                                chai.assert.equal(res.body.team[0].pokedexNumber, 1);
+                                done();
+                            });
+
+                    });
+            });
+
+    });
 })
+
+after((done) => {
+    usersController.cleanUpUsers();
+    done();
+});
