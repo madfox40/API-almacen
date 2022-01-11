@@ -1,7 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const authRoutes = require('./routers/auth').router;
-const teamRoutes = require('./controllers/teams').router;
+const teamRoutes = require('./routers/teams').router;
 
 const app = express();
 app.use(bodyParser.json());

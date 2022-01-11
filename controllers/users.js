@@ -1,23 +1,31 @@
 const uuid = require('uuid');
 const crypto = require('../crypto');
-
+const teams = require('./teams');
 
 const userDataBase = {};
 
 
+const getUser = (userID) => {
+    return userDataBase[userID];
+};
+
 const registerUser = (userName, password) => {
     //Guardar en la base de datos nuestro usuario
     let hasedPwd = crypto.hashPasswordSync(password); //en result tenemos el hash
-    userDataBase[uuid.v4()] = {
+    let userId = uuid.v4();
+    userDataBase[userId] = {
         userName: userName,
         password: hasedPwd
     }
+    teams.bootstrapTeam(userId);
 };
 
 const getUserIdFromUserName = (userName) => {
     for (let user in userDataBase) {
         if (userDataBase[user].userName == userName) {
-            return userDataBase[user];
+            let userData = userDataBase[user];
+            userData.userId = user;
+            return userData;
         }
     }
 }
@@ -36,3 +44,5 @@ const checkUserCredentials = (userName, password, done) => {
 
 exports.checkUserCredentials = checkUserCredentials;
 exports.registerUser = registerUser;
+exports.getUser = getUser;
+exports.getUserIdFromUserName = getUserIdFromUserName;

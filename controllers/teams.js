@@ -1,27 +1,22 @@
-const express = require('express');
-const res = require('express/lib/response');
-const router = express.Router();
-const passport = require('passport'); //Pasport desencripta los JWT
-require('../auth')(passport); //Lammamos a la función pasándole como parámetro passport y lo que hace es modificar
-//passport para que funcione como le hemos indicado
+let teamDatabase = {};
 
-router.route('/')
-    //Esta función protege login
-    //Hace una autentificación usando jwt Json web token
-    .get(passport.authenticate('jwt', { session: false }),
-        (req, res, next) => {
-            res.status(200).send('Hello wotld!');
-        })
-    .put();
+const bootstrapTeam = (userId) =>{
+    teamDatabase[userId] = [{name: 'Charizard'}, {name:'Blastoise'}];
+}
 
-router.route('pokemons')
-    .post(() => {
-        res.status(200).send('Hello World')
-    })
+const addPokemon = (userId,pokemonName) => {
+    teamDatabase[userId].push({name: pokemonName});
+}
 
-router.route('pokemons/:pokeid')
-    .delete(() => {
-        res.status(200).send('Hello World')
-    })
+const getTeamOfUser = (userId) => {
+    return teamDatabase[userId];
+}
 
-exports.router = router;
+const setTeam = (userId, team) => {
+    teamDatabase[userId] = team;
+}
+
+exports.setTeam = setTeam;
+exports.bootstrapTeam = bootstrapTeam;
+exports.addPokemon = addPokemon;
+exports.getTeamOfUser = getTeamOfUser;
