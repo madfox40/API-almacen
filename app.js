@@ -1,14 +1,16 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const middlewares = require('./middlewares');
+
 const authRoutes = require('./auth/auth.router').router;
 const teamRoutes = require('./teams/teams.router').router;
 
 const app = express();
-app.use(bodyParser.json());
 //App es el objeto servidor
 // Es decir el ejecutable para levantar el servidor ""
 
 const port = 3000;
+
+middlewares.setUpMiddleWares(app);
 
 
 

@@ -1,7 +1,7 @@
 const chai = require("chai");
 const chaiHTTP = require('chai-http');
 const app = require('../../app').app;
-const usersController = require('../auth.controller');
+const usersController = require('../users.controller');
 chai.use(chaiHTTP);
 //con chai.use y dentro un plugin lo implementamos para que funcione con chai
 //nos permite hacer chai.get, chai.post....
