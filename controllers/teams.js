@@ -1,7 +1,7 @@
 let teamDatabase = {};
 
 const bootstrapTeam = (userId) =>{
-    teamDatabase[userId] = [{name: 'Charizard'}, {name:'Blastoise'}];
+    teamDatabase[userId] = [];
 }
 
 const addPokemon = (userId,pokemonName) => {

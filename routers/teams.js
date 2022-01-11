@@ -20,8 +20,12 @@ router.route('/')
                 team: teamsControler.getTeamOfUser(req.user.userId)
             });
         })
-    .put((req, res) => {
-        teamsControler.setTeam(req.body.user, req.body.team);
+    .put(passport.authenticate('jwt', { session: false }),
+        (req, res) => {
+            console.log(req.body.team);
+            console.log(req.user.userId);
+        teamsControler.setTeam(req.user.userId, req.body.team);
+        res.status(200).send();
     });
 
 router.route('pokemons')
