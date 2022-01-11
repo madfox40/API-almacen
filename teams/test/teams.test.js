@@ -1,11 +1,10 @@
 const chai = require('chai');
 const chaiHTTP = require('chai-http');
 chai.use(chaiHTTP);
-const usersController = require('../controllers/users');
-const teamsControler = require('../controllers/teams');
+const usersController = require('../../auth/auth.controller');
+const teamsControler = require('../teams.controller');
 
-const app = require('../app').app;
-const { get } = require('express/lib/response');
+const app = require('../../app').app;
 
 beforeEach((done) => {
     usersController.registerUser('bettatech', '1234');

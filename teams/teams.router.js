@@ -2,10 +2,10 @@ const express = require('express');
 const res = require('express/lib/response');
 const router = express.Router();
 const passport = require('passport'); //Pasport desencripta los JWT
-const teamsControler = require('../controllers/teams');
-const usersController = require('../controllers/users');
+const teamsControler = require('./teams.controller');
+const usersController = require('../auth/auth.controller');
 const axios = require('axios').default;
-require('../auth')(passport); //Lammamos a la función pasándole como parámetro passport y lo que hace es modificar
+require('../tools/auth')(passport); //Lammamos a la función pasándole como parámetro passport y lo que hace es modificar
 //passport para que funcione como le hemos indicado
 
 

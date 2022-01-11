@@ -1,10 +1,8 @@
 const chai = require("chai");
 const chaiHTTP = require('chai-http');
-const app = require('../app').app;
-
+const app = require('../../app').app;
+const usersController = require('../auth.controller');
 chai.use(chaiHTTP);
-const usersController = require('../controllers/users');
-const teamsController = require('../controllers/teams');
 //con chai.use y dentro un plugin lo implementamos para que funcione con chai
 //nos permite hacer chai.get, chai.post....
 
@@ -17,7 +15,11 @@ const teamsController = require('../controllers/teams');
 
 
 
-
+beforeEach((done) => {
+    usersController.registerUser('bettatech', '1234');
+    usersController.registerUser('victor22junio', '4321');
+    done();
+});
 
 describe('Test de autentificación', () => {
 
@@ -43,4 +45,9 @@ describe('Test de autentificación', () => {
             });
     });
 
+});
+
+after((done) => {
+    usersController.cleanUpUsers();
+    done();
 });
