@@ -5,11 +5,11 @@ const usersController = require('../controllers/users');
 const teamsControler = require('../controllers/teams');
 
 const app = require('../app').app;
+const { get } = require('express/lib/response');
 
 beforeEach((done) => {
     usersController.registerUser('bettatech', '1234');
     usersController.registerUser('victor22junio', '4321');
-    console.log('Se ha hecho esta wea');
     done();
 });
 
@@ -21,7 +21,7 @@ afterEach((done) => {
 describe('Pruebas de teams', () => {
     it("Should return the team of the given user", (done) => {
         //Primero logueamos al usuario
-        let team =  [{ name: 'Charizard' }, { name: 'Blastoise' }, { name: 'Pikachu' } ];
+        let team = [{ name: 'Charizard' }, { name: 'Blastoise' }, { name: 'Pikachu' }];
         chai.request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
@@ -32,7 +32,7 @@ describe('Pruebas de teams', () => {
                 chai.assert.equal(res.statusCode, 200);
                 chai.request(app)
                     .put('/team')
-                    .send({team:team})
+                    .send({ team: team })
                     .set('Authorization', `jwt ${token}`)
                     .end((err, res) => {
                         chai.request(app)
@@ -57,7 +57,7 @@ describe('Pruebas de teams', () => {
 
     it("Should return the pokedex number", (done) => {
         //Primero logueamos al usuario
-        let pokemonName =  'bulbasaur';
+        let pokemonName = 'bulbasaur';
         chai.request(app)
             .post('/auth/login')
             .set('content-type', 'application/json')
@@ -68,7 +68,7 @@ describe('Pruebas de teams', () => {
                 chai.assert.equal(res.statusCode, 200);
                 chai.request(app)
                     .post('/team/pokemons')
-                    .send({name:pokemonName})
+                    .send({ name: pokemonName })
                     .set('Authorization', `jwt ${token}`)
                     .end((err, res) => {
                         chai.request(app)
@@ -89,7 +89,44 @@ describe('Pruebas de teams', () => {
             });
 
     });
-})
+
+    it("Should return 200 if is deleted successfully", (done) => {
+        //Primero logueamos al usuario
+        let team = [{ name: 'Charizard' }, { name: 'Blastoise' }, { name: 'Pikachu' }];
+        chai.request(app)
+            .post('/auth/login')
+            .set('content-type', 'application/json')
+            .send({ user: 'victor22junio', password: '4321' })
+            .end((err, res) => {
+                let token = res.body.token;
+                //Comprobamos si el token es correcto
+                chai.assert.equal(res.statusCode, 200);
+                chai.request(app)
+                    .put('/team')
+                    .send({ team: team })
+                    .set('Authorization', `jwt ${token}`)
+                    .end((err, res) => {
+                        chai.request(app)
+                            .delete('/team/pokemons/2')
+                            .set('Authorization', `jwt ${token}`)
+                            .end((err, res) => {
+                                chai.request(app)
+                                .get('/team')
+                                    .set('Authorization', `jwt ${token}`)
+                                    .end((err, res) => {
+                                        chai.assert.equal(res.statusCode, 200);
+                                        chai.assert.equal(res.body.trainer, 'victor22junio');
+                                        chai.assert.equal(res.body.team.length, team.length - 1);
+                                        done();
+                                    });
+                            });
+                    });
+
+            });
+    });
+
+});
+
 
 after((done) => {
     usersController.cleanUpUsers();

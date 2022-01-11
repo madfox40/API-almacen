@@ -15,7 +15,7 @@ module.exports = (passport) => {
     //Con la contraseña y el token solo tiene que desencriptarlo
     //Esta estrategia es la que decodifica los tokens
     passport.use(new JwtStrategy(opts, (decoded, done) =>{
-        console.log('decoded jwt', decoded); //Aquí mostramos el jwt decodificado
+        //console.log('decoded jwt', decoded); //Aquí mostramos el jwt decodificado
         return done(null, decoded); // Done(error en caso de que haya error, el usuario (Es decir lo que hemos decodificado))
     }));
 }
