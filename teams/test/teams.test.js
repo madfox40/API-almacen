@@ -12,9 +12,9 @@ beforeEach((done) => {
     done();
 });
 
-afterEach((done) => {
-    teamsControler.cleanUpTeam();
-    done();
+//Como ahora usamos promesas ya no necesitamos el done
+afterEach(async () => {
+    await teamsControler.cleanUpTeam();
 });
 
 describe('Pruebas de teams', () => {
@@ -110,7 +110,7 @@ describe('Pruebas de teams', () => {
                             .set('Authorization', `jwt ${token}`)
                             .end((err, res) => {
                                 chai.request(app)
-                                .get('/team')
+                                    .get('/team')
                                     .set('Authorization', `jwt ${token}`)
                                     .end((err, res) => {
                                         chai.assert.equal(res.statusCode, 200);
@@ -124,6 +124,44 @@ describe('Pruebas de teams', () => {
             });
     });
 
+
+    it("Should not be able to add pokkemon if you alredy have 6", (done) => {
+        //Primero logueamos al usuario
+        let team = [
+            { name: 'Charizard' },
+            { name: 'Blastoise' },
+            { name: 'Pikachu' },
+            { name: 'Charizard' },
+            { name: 'Blastoise' },
+            { name: 'Pikachu' }];
+        let pokemonName = 'vibrava';
+        chai.request(app)
+            .post('/auth/login')
+            .set('content-type', 'application/json')
+            .send({ user: 'victor22junio', password: '4321' })
+            .end((err, res) => {
+                let token = res.body.token;
+                //Comprobamos si el token es correcto
+                chai.assert.equal(res.statusCode, 200);
+                chai.request(app)
+                    .put('/team')
+                    .send({ team: team })
+                    .set('Authorization', `jwt ${token}`)
+                    .end((err, res) => {
+                        chai.request(app)
+                            .post('/team/pokemons')
+                            .send({ name: pokemonName })
+                            .set('Authorization', `jwt ${token}`)
+                            .end((err, res) => {
+                                        console.log(res.body.team);
+                                        chai.assert.equal(res.statusCode, 400);
+                                        done();
+                            });
+
+                    });
+
+            });
+    });
 });
 
 

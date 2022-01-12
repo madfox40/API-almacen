@@ -5,48 +5,41 @@ const axios = require('axios').default;
 const teamsControler = require('./teams.controller');
 const usersController = require('../auth/users.controller')
 
-const getTeamFromUser = (req, res) =>  {
+const getTeamFromUser = async (req, res) => {
+    let team = await teamsControler.getTeamOfUser(req.user.userId);
     let user = usersController.getUser(req.user.userId);
     res.status(200).json({
         trainer: user.userName,
-        team: teamsControler.getTeamOfUser(req.user.userId)
+        team: team
     })
 };
 
 
-const setTeamToUser = (req,res) => {
+const setTeamToUser = (req, res) => {
     teamsControler.setTeam(req.user.userId, req.body.team);
     res.status(200).send();
 };
 
-const addPokemonToTeam = (req,res) => {
+const addPokemonToTeam = async (req, res) => {
     let pokemonName = req.body.name;
     console.log('Calling Pokeapi');
-    axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`)
-        .then(function (response) {
-            //sucess
-            let pokemon = {
-                name: pokemonName,
-                pokedexNumber: response.data.id
-            };
-            teamsControler.addPokemon(req.user.userId, pokemon);
-
-            res.status(201).json(pokemon);
-        })
-        .catch(function (error) {
-            console.log(error);
-            res.status(400).json({ mssage: error });
-            //error
-        })
-        .then(function () {
-            //final
-        });
+    let pokeApiResponse = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemonName}`);
+    let pokemon = {
+        name: pokemonName,
+        pokedexNumber: pokeApiResponse.data.id
+    }
+    try {
+        await teamsControler.addPokemon(req.user.userId, pokemon);
+        res.status(201).json(pokemon);
+    } catch (error) {
+        res.status(400).json({ message: 'You have already 6 pokemon' });
+    }
 };
 
-const deletePokemonFromTeam = (req,res) => {
-        teamsControler.deletePokemon(req.user.userId, req.params.pokeid);
-        res.status(200).send('Hello World')
-} ;
+const deletePokemonFromTeam = (req, res) => {
+    teamsControler.deletePokemon(req.user.userId, req.params.pokeid);
+    res.status(200).send('Hello World')
+};
 
 exports.getTeamFromUser = getTeamFromUser;
 exports.setTeamToUser = setTeamToUser;

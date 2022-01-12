@@ -13,7 +13,6 @@ const port = 3000;
 middlewares.setUpMiddleWares(app);
 
 
-
 app.get('/', (req, res) => {
     res.status(200).send('Hello World');
 });
